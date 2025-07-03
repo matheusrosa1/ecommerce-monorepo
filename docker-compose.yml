@@ -43,6 +43,21 @@ services:
     networks:
       - ecommerce-network
 
+  product-catalog-service:
+    build:
+      context: ./apps/product-catalog-service
+    container_name: product-catalog-service
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-db:5432/${POSTGRES_DB}
+      - RABBITMQ_URL=amqp://rabbitmq
+    depends_on:
+      - postgres-db
+      - rabbitmq
+    networks:
+      - ecommerce-network
+
 volumes:
   postgres_data:
     driver: local
