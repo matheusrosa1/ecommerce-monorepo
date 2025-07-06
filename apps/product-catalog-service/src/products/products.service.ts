@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Category } from 'src/categories/entities/category.entity';
+import { CategoriesService } from 'src/categories/categories.service';
 import { FileStorageService } from 'src/storage/file-storage-service';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -16,9 +16,7 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-    @InjectRepository(Category)
-    private readonly categoryRepository: Repository<Category>,
-    @InjectRepository(FileStorageService)
+    private readonly categoriesService: CategoriesService,
     private readonly fileStorageService: FileStorageService,
   ) {}
 
@@ -35,9 +33,7 @@ export class ProductsService {
 
     const { categoryId, ...productData } = createProductDto;
 
-    const category = await this.categoryRepository.findOneBy({
-      id: categoryId,
-    });
+    const category = await this.categoriesService.findOne(categoryId);
 
     if (!category) {
       throw new NotFoundException(
@@ -54,19 +50,73 @@ export class ProductsService {
     return this.productRepository.save(product);
   }
 
-  findAll() {
-    return `This action returns all products`;
+  async findAll(): Promise<Product[]> {
+    const products = await this.productRepository.find({
+      relations: ['category'],
+    });
+
+    if (products.length === 0) {
+      throw new NotFoundException('Nenhum produto encontrado!');
+    }
+
+    return products;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: string): Promise<Product> {
+    const product = await this.productRepository.findOne({
+      where: { id },
+      relations: ['category'],
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Produto com ID ${id} não encontrado!`);
+    }
+
+    return product;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+    imageFile?: Express.Multer.File,
+  ): Promise<Product> {
+    const { categoryId, ...productData } = updateProductDto;
+    const product = await this.findOne(id);
+
+    let newImageUrl = product.imageUrl;
+
+    if (imageFile) {
+      if (product.imageUrl) {
+        await this.fileStorageService.delete(product.imageUrl);
+      }
+      newImageUrl = await this.fileStorageService.save(imageFile);
+    }
+
+    // Atualiza as propriedades do produto com noovos dados
+    Object.assign(product, productData);
+    product.imageUrl = newImageUrl;
+
+    if (categoryId) {
+      const category = await this.categoriesService.findOne(categoryId);
+      if (!category) {
+        throw new NotFoundException(
+          `Categoria com ID ${categoryId} não encontrada!`,
+        );
+      }
+      product.category.id = category.id;
+    }
+    return this.productRepository.save(product);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string): Promise<string> {
+    const product = await this.findOne(id);
+
+    if (product.imageUrl) {
+      await this.fileStorageService.delete(product.imageUrl);
+    }
+
+    await this.productRepository.delete(id);
+
+    return `Produto com ID ${id} foi removido com sucesso!`;
   }
 }
