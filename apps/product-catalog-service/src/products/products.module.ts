@@ -6,6 +6,7 @@ import { Category } from 'src/categories/entities/category.entity';
 import { FileStorageService } from 'src/storage/file-storage-service';
 import { LocalFileStorageService } from 'src/storage/local-file-storage-service';
 import { randomNameFile } from 'src/utils/random-name-file';
+import { CategoriesModule } from '../categories/categories.module';
 import { Product } from './entities/product.entity';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
@@ -19,6 +20,7 @@ import { ProductsService } from './products.service';
         filename: randomNameFile,
       }),
     }),
+    CategoriesModule,
   ],
   controllers: [ProductsController],
   providers: [
