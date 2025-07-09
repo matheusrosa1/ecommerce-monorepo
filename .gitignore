@@ -4,3 +4,6 @@
 # Node
 node_modules
 dist
+
+# Ignorar pastas de upload em todos os serviços
+/apps/*/uploads
