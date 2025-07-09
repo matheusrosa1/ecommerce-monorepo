@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsNumber, IsString, IsUrl, IsUUID } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
@@ -9,13 +10,10 @@ export class CreateProductDto {
   @IsNotEmpty()
   description: string;
 
+  @Type(() => Number)
   @IsNumber()
   @IsNotEmpty()
   price: number;
-
-  @IsUrl()
-  @IsNotEmpty()
-  imageUrl: string;
 
   @IsUUID()
   @IsNotEmpty()
