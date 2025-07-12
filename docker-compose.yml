@@ -61,6 +61,23 @@ services:
       - rabbitmq
     networks:
       - ecommerce-network
+  
+  shopping-cart-service:
+    build:
+      context: ./apps/shopping-cart-service # 1. Aponta para a pasta do novo serviço
+    container_name: shopping-cart-service
+    command: pnpm run start:dev               # 2. Inicia em modo de desenvolvimento
+    ports:
+    - "3001:3000"                         # 3. Expõe na porta 3001 para não conflitar
+    volumes:
+      - ./apps/shopping-cart-service:/app   # 4. Mapeia os arquivos para o hot-reload
+      - /app/node_modules
+    environment:
+      - REDIS_URL=redis://redis-cache:6379  # 5. Variável de ambiente para conectar ao Redis
+    depends_on:
+      - redis-cache                         # 6. Garante que o Redis inicie antes
+    networks:
+      - ecommerce-network
 
 volumes:
   postgres_data:
