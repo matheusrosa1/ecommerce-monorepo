@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -52,5 +53,12 @@ export class ProductsController {
   @Delete(':id')
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.remove(id);
+  }
+
+  @Get('batch')
+  findManyByIds(@Query('ids') ids: string) {
+    // Os IDs virão como uma string separada por vírgula, então nós a dividimos em um array
+    const idsArray = ids.split(',');
+    return this.productsService.findManyByIds(idsArray);
   }
 }
