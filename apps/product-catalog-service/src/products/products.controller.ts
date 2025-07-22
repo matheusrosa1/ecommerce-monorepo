@@ -35,6 +35,13 @@ export class ProductsController {
     return this.productsService.findAll();
   }
 
+  @Get('batch')
+  findManyByIds(@Query('ids') ids: string) {
+    // Os IDs virão como uma string separada por vírgula, então nós a dividimos em um array
+    const idsArray = ids.split(',');
+    return this.productsService.findManyByIds(idsArray);
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.findOne(id);
@@ -53,12 +60,5 @@ export class ProductsController {
   @Delete(':id')
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.remove(id);
-  }
-
-  @Get('batch')
-  findManyByIds(@Query('ids') ids: string) {
-    // Os IDs virão como uma string separada por vírgula, então nós a dividimos em um array
-    const idsArray = ids.split(',');
-    return this.productsService.findManyByIds(idsArray);
   }
 }
