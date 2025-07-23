@@ -79,6 +79,29 @@ services:
     networks:
       - ecommerce-network
 
+  #####################################
+  # MICROSSERVIÇO DE PROCESSAMENTO DE PAGAMENTOS
+  #####################################
+  payment-service:
+    build:
+      context: ./apps/payment-service
+    container_name: payment-service
+    command: pnpm run start:dev
+    ports:
+      - "3002:3000" # Expondo na porta 3002
+    volumes:
+      - ./apps/payment-service:/app
+      - /app/node_modules
+    environment:
+      # Reutilizando o mesmo banco de dados, mas poderia ser outro
+      - DATABASE_URL=postgresql://${POSTGRE_USER}:${POSTGRE_PASSWORD}@postgres-db:5432/${POSTGRE_DB}
+      - RABBITMQ_URL=amqp://rabbitmq # URL para conectar ao RabbitMQ
+    depends_on:
+      - postgres-db
+      - rabbitmq
+    networks:
+      - ecommerce-network
+
 volumes:
   postgres_data:
     driver: local
