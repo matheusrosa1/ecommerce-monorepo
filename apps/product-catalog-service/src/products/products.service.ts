@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoriesService } from 'src/categories/categories.service';
 import { FileStorageService } from 'src/storage/file-storage-service';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
@@ -118,5 +118,14 @@ export class ProductsService {
     await this.productRepository.delete(id);
 
     return `Produto com ID ${id} foi removido com sucesso!`;
+  }
+
+  findManyByIds(ids: string[]): Promise<Product[]> {
+    return this.productRepository.find({
+      where: {
+        id: In(ids), // O operador 'In' busca todos os registros cujos IDs estão no array
+      },
+      relations: ['category'],
+    });
   }
 }
