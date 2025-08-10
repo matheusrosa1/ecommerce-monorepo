@@ -82,7 +82,7 @@ Para executar o ambiente de desenvolvimento localmente, você precisará ter o D
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/SEU_USUARIO/e-commerce-monorepo.git](https://github.com/SEU_USUARIO/e-commerce-monorepo.git)
+    git clone git@github.com:matheusrosa1/ecommerce-monorepo.git
     cd e-commerce-monorepo
     ```
 
