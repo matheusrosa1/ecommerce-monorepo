@@ -1,7 +1,5 @@
 # meu-ecommerce-monorepo/docker-compose.yml
 
-version: '3.8'
-
 services:
   #####################################
   # BANCO DE DADOS DO SERVIÇO DE CATÁLOGO E PAGAMENTOS

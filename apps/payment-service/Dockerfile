@@ -4,15 +4,14 @@ FROM node:20-alpine
 # Define o diretório de trabalho
 WORKDIR /app
 
-# Instala o pnpm globalmente ANTES de copiar os arquivos
-# Isso otimiza o cache do Docker
-RUN npm install -g pnpm
+# Ativa uma versão fixa do pnpm para manter builds reproduzíveis.
+RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
 
 # Copia os arquivos de gerenciamento de pacotes
 COPY package.json pnpm-lock.yaml ./
 
-# Instala todas as dependências (incluindo as de dev)
-RUN pnpm install
+# Instala exatamente as dependências registradas no lockfile.
+RUN pnpm install --frozen-lockfile
 
 # Copia o resto do código-fonte
 COPY . .
